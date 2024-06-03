@@ -31,9 +31,11 @@ METHOD
 from Bio .Seq import Seq
 import re
 import argparse
+from Bio import SeqIO
 
 def generate_codon_file(name_file, seqobj):
-    with open(name_file, "w") as archivo:
+    with open(name_file, "a") as archivo:
+        archivo.write("\n>\n")
         j = 0
         for codon in re.findall(r"(.{3})", str(seqobj)):
             archivo.write(f"{codon} ")
@@ -47,20 +49,27 @@ parser = argparse.ArgumentParser(description="Lee archivo de entrada y salida")
 parser.add_argument("input_file", type=str, help="El archivo de texto que quieres procesar.")
 args = parser.parse_args()
 
-with open(args.input_file, "r") as f:
-    ADN = f.read().upper() 
-seqobj = Seq(ADN)
-frame = 0
-k = 0
-while frame <= 5:
-    if frame == 3:
-        seqobj = seqobj.reverse_complement()
-        k = 0
-    seq = seqobj[k:]
-    # print(f"frame{frame+1} is {seq}")
-    file = "Frame_" + str(frame + 1)
-    generate_codon_file(file, seq)
-    frame += 1
-    k += 1
+#with open(args.input_file, "r") as f:
+    #ADN = f.read().upper() 
+#seqobj = Seq(ADN)
+for l in range(1,6):
+    new_file = "Frame_" + str(l)
+    with open(new_file, "w"):
+        pass
+
+for seq in SeqIO.parse(args.input_file, "fasta"):
+    seqobj = seq.seq
+    frame = 0
+    k = 0
+    while frame <= 5:
+        if frame == 3:
+            seqobj = seqobj.reverse_complement()
+            k = 0
+        seq = seqobj[k:]
+        # print(f"frame{frame+1} is {seq}")
+        file = "Frame_" + str(frame + 1)
+        generate_codon_file(file, seq)
+        frame += 1
+        k += 1
 
 
